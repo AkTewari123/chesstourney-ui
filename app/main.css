@@ -1,0 +1,11 @@
+body {
+    font-family: "Satoshi", Arial, Helvetica, sans-serif;
+}
+
+input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+input {
+    font-size: 16px;
+}
