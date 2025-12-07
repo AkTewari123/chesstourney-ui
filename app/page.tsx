@@ -1,8 +1,18 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
-import { Check, ChessQueen, Copy, Plus, User, X } from "lucide-react"; // Import 'X' icon for closing
+import {
+  Check,
+  ChessKing,
+  ChessQueen,
+  Copy,
+  Plus,
+  User,
+  X,
+} from "lucide-react"; // Import 'X' icon for closing
 import "./main.css";
 import { Input } from "@/components/ui/input";
+import { signOut } from "firebase/auth";
+import { auth } from "./firebaseConfig";
 
 export default function Home() {
   // New state to control the visibility of the modal/popup
@@ -240,7 +250,13 @@ export default function Home() {
             <h1 className="text-white font-bold ml-2 text-2xl">
               Chess<span className="text-[#7BADF9]">Tourney</span>
             </h1>
-            <div className="bg-blue-500/30 ml-auto rounded-full p-2">
+            <div
+              onClick={async () => {
+                await signOut(auth);
+                window.location.href = "/login";
+              }}
+              className="bg-blue-500/30 cursor-pointer ml-auto rounded-full p-2"
+            >
               <User color="#8ec5ff" size={30} />
             </div>
           </div>
@@ -272,16 +288,27 @@ export default function Home() {
               </div>
             </div>
           </div>
-
+          <button
+            onClick={() => (window.location.href = "/sync-lichess")}
+            className="mt-6 p-4 rounded-xl text-white bg-blue-500/20 font-bold text-2xl w-full"
+          >
+            Sync Lichess Account
+          </button>
+          <p className="text-gray-300 mt-1">
+            After you're done scanning, you can sync your Lichess account to
+            upload games to your studies directly! This will only work if you
+            are signed in.
+          </p>
           {/* Scan Scoresheet button (Only visible when modal is closed) */}
           {!modalOpen && (
             <button
               onClick={openModalAndStartCamera}
-              className="mt-6 p-4 rounded-xl text-blue-900 bg-white font-bold text-2xl w-full"
+              className="mt-6 p-4 rounded-xl text-black bg-white font-bold text-2xl w-full"
             >
               Scan Scoresheet
             </button>
           )}
+
           {pgnData && (
             <div className="bg-blue-500/20 mt-6 p-4 rounded-xl">
               <h2 className="font-bold mb-2 text-2xl text-white">
