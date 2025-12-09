@@ -140,8 +140,8 @@ export default function Page() {
               Go Back Home
             </Button>
             <p className="text-white text-center">
-              You have not saved any images yet. Start uploading your chess
-              scoresheets to see them here!
+              You have not scanned any scoresheets yet. Start uploading your
+              chess scoresheets to see them here!
             </p>
           </div>
         </div>
