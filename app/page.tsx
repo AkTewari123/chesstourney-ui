@@ -256,6 +256,51 @@ export default function Home() {
       setUploading(false);
     }
   };
+  const uploadImageFromFiles = async (fileFromPicker: any) => {
+    setUploading(true);
+    try {
+      let base64;
+      toast.info("Uploading image, please wait...");
+      if (fileFromPicker) {
+        // user selected a file
+        base64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () =>
+            resolve((reader?.result as string)?.split(",")[1]);
+          reader.onerror = reject;
+          reader.readAsDataURL(fileFromPicker);
+        });
+      } else {
+        // use captured image
+        if (!capturedImage) return;
+        base64 = capturedImage.split(",")[1];
+      }
+
+      const res = await fetch("https://pgnserver-ocr.vercel.app/upload_image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image_base64: base64 }),
+      });
+
+      const data = await res.json();
+      axios.post("/api/add_image", {
+        image_base64: base64,
+        filename: fileFromPicker ? fileFromPicker.name : "captured_image.png",
+        timestamp: new Date().toISOString(),
+        owner: user ? user.displayName : "anonymous",
+        pgn: data.pgn || "",
+      });
+      toast.info("PGN extracted successfully!");
+      console.log("Upload response:", data);
+      setPgnData(data.pgn || "No PGN data received");
+      closeModal();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to upload image");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const retakePhoto = () => {
     setCapturedImage(null);
@@ -379,7 +424,6 @@ export default function Home() {
               <span>Welcome, {user.displayName}!</span>
             </div>
           </div>
-
           {/* Search, Tournaments, Player List Sections... (unchanged) */}
           <div className="bg-blue-500/20 mt-6 p-4 rounded-xl">
             <h1 className="font-bold mb-4 text-2xl text-white">
@@ -394,6 +438,7 @@ export default function Home() {
           <div className="bg-blue-500/20 mt-6 p-4 rounded-xl">
             <h1 className="font-bold mb-2 text-2xl text-white">Tournaments</h1>
           </div>
+
           <div className="bg-blue-500/20 mt-6 p-4 rounded-xl">
             <div className="flex flex-row">
               <h1 className="font-bold text-2xl text-white">Player List</h1>
@@ -407,6 +452,7 @@ export default function Home() {
               </div>
             </div>
           </div>
+
           <button
             onClick={() => (window.location.href = "/sync-lichess")}
             className="mt-6 p-4 rounded-xl text-white bg-blue-500/20 font-bold text-2xl w-full"
@@ -428,6 +474,23 @@ export default function Home() {
             </button>
           )}
 
+          <input
+            type="file"
+            className="mt-6 p-4 rounded-xl text-black bg-white font-bold text-2xl w-full"
+            accept="image/*"
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              const file = e.target.files?.[0]; // safe optional chaining
+              if (file) {
+                uploadImageFromFiles(file);
+              }
+            }}
+          />
+          <button
+            onClick={() => (window.location.href = "/saved-items")}
+            className="mt-6 p-4 rounded-xl text-white bg-blue-500/20 font-bold text-2xl w-full"
+          >
+            View Saved PGNs & Images
+          </button>
           {pgnData && (
             <div className="bg-blue-500/20 mt-6 p-4 rounded-xl">
               <h2 className="font-bold mb-2 text-2xl text-white">
@@ -603,6 +666,12 @@ export default function Home() {
                       target="_blank"
                       className="bg-blue-500 mt-2 p-2 rounded-lg text-white hidden"
                     ></a>
+
+                    <p className="text-white mt-1">
+                      Just in case we got something wrong, we store the scanned
+                      pgn in our database for you to review & make corrections
+                      later
+                    </p>
                   </>
                 ) : (
                   <p className="text-red-400 mt-2 text-sm">
@@ -613,7 +682,6 @@ export default function Home() {
               </div>
             </div>
           )}
-
           {/* Hidden canvas for capture */}
           <canvas ref={canvasRef} style={{ display: "none" }} />
         </div>
