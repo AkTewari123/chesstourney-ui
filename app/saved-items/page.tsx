@@ -5,10 +5,8 @@ import "../main.css";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { auth, db } from "../firebaseConfig";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import axios from "axios";
-import { formatString } from "@/functions/formatString";
-import { toast, ToastContainer } from "react-toastify";
+import { doc, getDoc } from "firebase/firestore";
+import { ToastContainer } from "react-toastify";
 import { Check, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -32,42 +30,6 @@ export default function Page() {
           async (docSnap) => {
             if (docSnap.exists()) {
               setUserInfo(docSnap.data());
-              try {
-                axios
-                  .get(
-                    `https://lichess.org/api/study/by/${
-                      docSnap.data()["lichessId"]
-                    }`,
-                    {
-                      headers: {
-                        Authorization: `Bearer ${
-                          docSnap.data()["lichessToken"]
-                        }`,
-                      },
-                    }
-                  )
-                  .then(async (data) => {
-                    const writeData = formatString(
-                      JSON.parse(JSON.stringify(data.data))
-                    );
-                    console.log(writeData);
-                    console.log(typeof writeData);
-                    await updateDoc(doc(db, "users", `${user.displayName}`), {
-                      studies: writeData,
-                    });
-                    setValue(userInfo?.lastUploadedStudy || "");
-                  })
-                  .catch((error) => {
-                    toast.info(
-                      "Error fetching studies from Lichess, sync your account to automatically upload your PGN to a study."
-                    );
-                  });
-                console.log("Fetched user data:", docSnap.data());
-              } catch (error) {
-                toast(
-                  "Error fetching studies from Lichess, sync your account to automatically upload your PGN to a study."
-                );
-              }
             } else {
               setUserInfo(null);
               window.alert("No user data found!");
@@ -171,6 +133,12 @@ export default function Page() {
             <h1 className="text-3xl font-bold mb-6 text-white">
               No Saved Images
             </h1>
+            <Button
+              onClick={() => router.push("/")}
+              className="w-full mb-2 text-lg bg-blue-500/20"
+            >
+              Go Back Home
+            </Button>
             <p className="text-white text-center">
               You have not saved any images yet. Start uploading your chess
               scoresheets to see them here!

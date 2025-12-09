@@ -69,6 +69,9 @@ export default function RegisterPage() {
           lichessId: "",
           lichessToken: "",
           studies: [],
+          pgns: [],
+          images: [],
+          dates_uploaded: [],
         });
       }
 

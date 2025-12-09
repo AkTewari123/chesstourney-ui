@@ -287,6 +287,7 @@ export default function Home() {
         timestamp: new Date().toISOString(),
         owner: user ? user.displayName : "anonymous",
         pgn: data.pgn || "",
+        pgns: userInfo ? userInfo.pgns || [] : [],
       });
       toast.info("PGN extracted successfully!");
       console.log("Upload response:", data);

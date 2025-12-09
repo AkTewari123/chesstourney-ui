@@ -9,7 +9,8 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 export const POST = async (req: NextRequest) => {
   try {
-    const { image_base64, filename, owner, timestamp, pgn } = await req.json();
+    const { image_base64, filename, owner, timestamp, pgn, pgns } =
+      await req.json();
 
     if (!image_base64) {
       return NextResponse.json({ error: "No image provided" }, { status: 400 });
@@ -35,10 +36,10 @@ export const POST = async (req: NextRequest) => {
       .from("upload-images")
       .getPublicUrl(uploadData.path);
     const publicUrl = publicData.publicUrl;
-
+    pgns.push(pgn);
     await updateDoc(doc(db, "users", owner), {
       images: arrayUnion(publicUrl),
-      pgns: arrayUnion(pgn),
+      pgns: pgns,
       dates_uploaded: arrayUnion(timestamp),
     });
 

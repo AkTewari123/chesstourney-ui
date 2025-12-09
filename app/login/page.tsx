@@ -94,6 +94,9 @@ export default function SignInPage() {
             lichessId: "",
             lichessToken: "",
             studies: [],
+            pgns: [],
+            images: [],
+            dates_uploaded: [],
           },
           { merge: true }
         ); // Use merge: true just in case
