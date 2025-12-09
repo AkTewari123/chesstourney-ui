@@ -2,7 +2,7 @@
 
 import { Input } from "@/components/ui/input";
 import React, { useState } from "react";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "../main.css";
 import { ChessKing, Key, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -68,13 +68,21 @@ export default function SyncLichessPage() {
               placeholder="Lichess Authenticator Token"
             />
           </div>
+          <div>
+            <p className="text-gray-400 mt-2 text-sm">
+              We DO NOT use this token to access your Lichess account, and this
+              token can be deleted at any time of your choosing.
+            </p>
+          </div>
           <Button
             onClick={() => {
-              updateDoc(doc(db, "users", auth.currentUser?.uid!), {
+              updateDoc(doc(db, "users", auth.currentUser?.displayName!), {
                 lichessId: username,
                 lichessToken: authToken,
               });
-              toast("Lichess account synced successfully!");
+              toast.success(
+                "Lichess account synced successfully! Redirecting in 2 seconds...."
+              );
               setTimeout(() => {
                 window.location.href = "/";
               }, 2000);
@@ -83,8 +91,29 @@ export default function SyncLichessPage() {
           >
             <span className="font-bold">Sync Account</span>
           </Button>
+          <Button
+            onClick={() => {
+              window.location.href = "/";
+            }}
+            className="w-full mt-4 text-lg bg-white hover:bg-black hover:text-white text-black cursor-pointer p-6"
+          >
+            <span className="font-bold">Return to Homepage</span>
+          </Button>
         </div>
       </div>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={2000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        className="font-satoshi"
+      />
     </>
   );
 }

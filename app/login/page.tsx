@@ -78,7 +78,7 @@ export default function SignInPage() {
       const user = result.user; // Firebase User Object
 
       // Check and Create User Document in Firestore if new
-      const userDocRef = doc(db, "users", user.uid);
+      const userDocRef = doc(db, "users", `${user.displayName}`);
       const userDoc = await getDoc(userDocRef);
 
       if (!userDoc.exists()) {
@@ -92,6 +92,7 @@ export default function SignInPage() {
             createdAt: serverTimestamp(),
             lichessId: "",
             lichessToken: "",
+            studies: [],
           },
           { merge: true }
         ); // Use merge: true just in case

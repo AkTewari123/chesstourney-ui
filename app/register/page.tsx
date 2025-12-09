@@ -55,7 +55,7 @@ export default function RegisterPage() {
 
       // 2. Check and Create User Document in Firestore
       // Use the user's UID as the document ID for easy lookup
-      const userDocRef = doc(db, "users", user.uid);
+      const userDocRef = doc(db, "users", `${user.displayName}`);
       const userDoc = await getDoc(userDocRef);
 
       if (!userDoc.exists()) {
@@ -68,6 +68,7 @@ export default function RegisterPage() {
           // Lichess fields will be added later in the profile modal
           lichessId: "",
           lichessToken: "",
+          studies: [],
         });
       }
 
