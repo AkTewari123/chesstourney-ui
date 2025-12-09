@@ -492,6 +492,12 @@ export default function Home() {
               }
             }}
           />
+          <p className="text-gray-300 mt-1">
+            After you've scanned or put the image file in, we automatically save
+            the image to our database for your purview later. We also save the
+            parsed PGN.
+          </p>
+
           <button
             onClick={() => (window.location.href = "/saved-items")}
             className="mt-6 p-4 rounded-xl text-white bg-blue-500/20 font-bold text-2xl w-full"
