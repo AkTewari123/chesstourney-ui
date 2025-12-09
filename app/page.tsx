@@ -101,7 +101,7 @@ export default function Home() {
               }
             } else {
               setUserInfo(null);
-              window.alert("No user data found!");
+              // window.alert("No user data found!");
               window.location.href = "/login";
             }
           }
@@ -167,7 +167,7 @@ export default function Home() {
 
       const setupCamera = async () => {
         if (!navigator.mediaDevices?.getUserMedia) {
-          alert("Camera API not supported");
+          // alert("Camera API not supported");
           setStreaming(false);
           return;
         }
@@ -198,7 +198,7 @@ export default function Home() {
         } catch (err: any) {
           if (!isCancelled) {
             console.error("Error accessing camera:", err);
-            alert("Cannot access camera: " + err.message);
+            toast.error("Cannot access camera: " + err.message);
             // On error, stop streaming and close the modal
             setStreaming(false);
             setModalOpen(false);
@@ -251,7 +251,7 @@ export default function Home() {
       closeModal();
     } catch (err) {
       console.error(err);
-      alert("Failed to upload image");
+      toast.error("Failed to upload image");
     } finally {
       setUploading(false);
     }
@@ -296,7 +296,7 @@ export default function Home() {
       closeModal();
     } catch (err) {
       console.error(err);
-      alert("Failed to upload image");
+      toast.error("Failed to upload image");
     } finally {
       setUploading(false);
     }

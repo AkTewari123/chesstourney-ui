@@ -8,7 +8,7 @@ import { auth, db } from "../firebaseConfig";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import axios from "axios";
 import { formatString } from "@/functions/formatString";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { Check, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -82,6 +82,19 @@ export default function Page() {
   }, []);
   return user && userInfo ? (
     <>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        className="font-satoshi"
+      />
       {userInfo.images && userInfo.images.length > 0 ? (
         <div className="bg-[#0F182A] no-repeat bg-cover p-4 mt-0 min-h-screen">
           <div className="mx-auto min-h-[calc(100vh-32px)] bg-[#182138] p-8 rounded-[20px] max-w-[800px]">
