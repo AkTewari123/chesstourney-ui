@@ -524,7 +524,7 @@ export default function Home() {
                                     ([id]) => id === value
                                   )?.[1]
                                 }`
-                              : "Select a study"}
+                              : "Select a lichess study"}
                             <ChevronsUpDownIcon className="ml-2 h-4 w-4 opacity-50" />
                           </Button>
                         </PopoverTrigger>
@@ -580,7 +580,7 @@ export default function Home() {
                       >
                         <SelectTrigger className="w-[180px] h-[50px] text-white">
                           <SelectValue
-                            placeholder="Select Orientation"
+                            placeholder="Select Orientation (Optional)"
                             className="text-white"
                           />
                         </SelectTrigger>
