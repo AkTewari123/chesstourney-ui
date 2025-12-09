@@ -1,19 +1,65 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "../main.css";
 import { ChessKing, Key, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../firebaseConfig";
+import { onAuthStateChanged } from "firebase/auth";
+import { useRouter } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
 export default function SyncLichessPage() {
   const [username, setUsername] = useState("");
   const [authToken, setAuthToken] = useState("");
-  return (
+  const router = useRouter();
+  const [user, setUser] = useState<any>(null);
+  const [userInfo, setUserInfo] = useState<any>(null);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        router.push("/login");
+      } else {
+        setUser(user);
+        getDoc(doc(db, "users", `${user.displayName}`)).then(
+          async (docSnap) => {
+            if (docSnap.exists()) {
+              setUserInfo(docSnap.data());
+              if (docSnap.data().lichessId && docSnap.data().lichessToken) {
+                toast.info(
+                  "Lichess account already synced! You may add another key to replace the current one if you want. "
+                );
+              } else {
+                setUserInfo(null);
+                window.alert("No user data found!");
+                window.location.href = "/login";
+              }
+            }
+          }
+        );
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+  return user && userInfo ? (
     <>
       <div className="bg-[#0F182A] no-repeat bg-cover p-4 mt-0 min-h-screen flex items-center justify-center">
+        <ToastContainer
+          position="bottom-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="dark"
+          className="font-satoshi"
+        />
         <div className="w-full mx-auto bg-[#182138] text-white p-8 rounded-[20px] max-w-lg shadow-2xl">
           <div className="mb-4">
             <h1 className="text-white font-bold text-3xl text-center">
@@ -101,6 +147,9 @@ export default function SyncLichessPage() {
           </Button>
         </div>
       </div>
+    </>
+  ) : (
+    <div className="bg-[#0F182A] no-repeat bg-cover p-4 mt-0 min-h-screen flex items-center justify-center">
       <ToastContainer
         position="bottom-right"
         autoClose={2000}
@@ -114,6 +163,7 @@ export default function SyncLichessPage() {
         theme="dark"
         className="font-satoshi"
       />
-    </>
+      <Skeleton className="w-full h-[300px] mx-auto bg-[#182138] text-white p-8 rounded-[20px] max-w-lg shadow-2xl"></Skeleton>
+    </div>
   );
 }
