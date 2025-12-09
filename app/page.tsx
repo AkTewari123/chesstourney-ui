@@ -230,9 +230,7 @@ export default function Home() {
       setStreaming(false);
     }
   };
-  const [pgnData, setPgnData] = useState(
-    "1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8 10. d4 Nbd7 11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Na4 c5 16. dxe5 Nxe4 17. Bxe7 Qxe7 18. exd6 Qf6 19. Bd5 Nxd6 20. Bxb7 Nxb7 21. Qxd7 Nd6 22. Nxc5 Rfd8 23. Qg4 Qxb2 24. Reb1 Qc3 25. Ne4 Nxe4 26. Qxe4 Rab8 27. Ng5 g6 28. Qe7 Rf8 29. Ne4 Qd4 30. Rd1 Qb2 31. Rab1 Qxa2 32. Rxb4 Rxb4 33. Qxb4 Qe6 34. Rd6 Qe5 35. Nf6+ Kg7 36. Nd7 Qa1+ 37. Kh2 Re8 38. Qf4 f5 39. Nc5 Re7 40. Ne6+ Kf7 41. Ng5+ Kg7 42. Qh4 h6 43. Ne6+ Kf7 44. Nd8+ Ke8 45. Nc6 g5 46. Qxh6 Re1 47. Rd8+ Kf7 48. Rf8#"
-  );
+  const [pgnData, setPgnData] = useState<string>("");
   const uploadImage = async () => {
     if (!capturedImage) return;
     setUploading(true);
