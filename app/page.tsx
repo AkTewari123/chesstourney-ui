@@ -246,6 +246,14 @@ export default function Home() {
       console.log("Upload response:", data);
       setPgnData(data.pgn || "No PGN data received");
       // Close modal on successful upload
+      axios.post("/api/add_image", {
+        image_base64: base64,
+        filename: `${Math.floor(Math.random() * 1e12)}_captured.png`,
+        timestamp: new Date().toISOString(),
+        owner: user ? user.displayName : "anonymous",
+        pgn: data.pgn || "",
+        pgns: userInfo ? userInfo.pgns || [] : [],
+      });
       closeModal();
     } catch (err) {
       console.error(err);
