@@ -152,7 +152,7 @@ export default function SyncLichessPage() {
     <div className="bg-[#0F182A] no-repeat bg-cover p-4 mt-0 min-h-screen flex items-center justify-center">
       <ToastContainer
         position="bottom-right"
-        autoClose={2000}
+        autoClose={10000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick
