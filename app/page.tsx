@@ -101,7 +101,6 @@ export default function Home() {
               }
             } else {
               setUserInfo(null);
-              // window.alert("No user data found!");
               window.location.href = "/login";
             }
           }

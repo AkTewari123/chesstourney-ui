@@ -33,7 +33,7 @@ export default function SyncLichessPage() {
                 );
               } else {
                 setUserInfo(null);
-                window.alert("No user data found!");
+                toast.error("No user data found!");
                 window.location.href = "/login";
               }
             }

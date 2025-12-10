@@ -8,6 +8,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   signInWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
 import "../main.css";
 import { doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
@@ -39,7 +40,32 @@ export default function SignInPage() {
     }
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(auth, email, password)
+        .then(async (userCredential) => {
+          const user = userCredential.user;
+          const userDocRef = doc(db, "users", `${user.displayName}`);
+          const userDoc = await getDoc(userDocRef);
+          console.log(user.displayName, user.email, user.photoURL);
+          if (!userDoc.exists()) {
+            // User is new. Create a profile document in Firestore.
+            await setDoc(userDocRef, {
+              email: user.email,
+              displayName: user.displayName || "New User",
+              photoURL: user.photoURL,
+              createdAt: serverTimestamp(), // Use serverTimestamp() for best practice
+              lichessId: "",
+              lichessToken: "",
+              studies: [],
+              pgns: [],
+              images: [],
+              dates_uploaded: [],
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Firebase Sign-in Error:", error);
+          throw error; // Re-throw to handle it in the catch block below
+        });
 
       // Show success toast (replace with actual toast implementation)
       toast.success("Login Successful! Redirecting...");
@@ -62,7 +88,7 @@ export default function SignInPage() {
       }
 
       // Show error toast (replace with actual toast implementation)
-      alert(`Can't sign you in: ${errorMessage}`);
+      // alert(`Can't sign you in: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
@@ -103,7 +129,6 @@ export default function SignInPage() {
       }
 
       // Show success toast (replace with actual toast implementation)
-      alert("Google Sign-In Successful! Redirecting...");
 
       // Success: Redirect to the main application page
       window.location.href = "/";
@@ -117,7 +142,7 @@ export default function SignInPage() {
             "An error occurred during sign-in. Please try again.";
 
       // Show error toast (replace with actual toast implementation)
-      alert(`Google Sign-In Failed: ${errorMessage}`);
+      toast.error(`Google Sign-In Failed:.`);
     } finally {
       setLoading(false);
     }

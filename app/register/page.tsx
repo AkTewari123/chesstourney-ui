@@ -2,19 +2,19 @@
 "use client";
 import React, { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
-
-import {
-  ChessQueen,
-  Mail,
-  Lock,
-  ArrowRight,
-  UserPlus,
-  Chrome, // Used for Google Icon
-} from "lucide-react";
+import "../main.css";
+import { ChessQueen, Mail, Lock, ArrowRight, UserPlus } from "lucide-react";
 import { auth, db } from "../firebaseConfig";
 import { Input } from "@/components/ui/input";
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  updateProfile,
+} from "firebase/auth";
+import { Button } from "@/components/ui/button";
 // import { useAuth } from "@/context/AuthContext"; // Assume this hook is available
 
 export default function RegisterPage() {
@@ -26,14 +26,73 @@ export default function RegisterPage() {
   const handleEmailRegister = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
+
+    // 1. Get the Auth instance
+
     try {
-      // await registerWithEmail(email, password);
+      // 2. Call the Firebase function
+      await createUserWithEmailAndPassword(auth, email, password);
+      signInWithEmailAndPassword(auth, email, password).then(
+        async (userCredential) => {
+          const user = userCredential.user;
+          const pendingName = email;
+          if (!user.displayName) {
+            // 3. Create a Firestore document for the new user
+            await updateProfile(user, {
+              displayName: pendingName, // Use email prefix as display name
+            });
+          }
+          // 3. Create a Firestore document for the new user
+          const userDocRef = doc(db, "users", `${user.displayName}`);
+          const userDoc = await getDoc(userDocRef);
+          console.log(userDoc);
+          if (!userDoc.exists()) {
+            // User is new. Create a profile document in Firestore.
+            toast.success("Registration Successful! Redirecting...");
+            await setDoc(userDocRef, {
+              email: user.email,
+              displayName: user.displayName || "New User",
+              photoURL: user.photoURL,
+              createdAt: serverTimestamp(), // Use serverTimestamp() for best practice
+              lichessId: "",
+              lichessToken: "",
+              studies: [],
+              pgns: [],
+              images: [],
+              dates_uploaded: [],
+            });
+            window.location.href = "/";
+          }
+        }
+      );
+
+      // Show success toast (replace with actual toast implementation)
+
+      // Redirect on successful registration
+      // You can use a router or window.location.href
+      // For example, using Next.js router:
+      // router.push("/");
+
+      // For now, we will just log the email to the console
+      // This is just for demonstration purposes.
+      // In a real application, you would redirect the user or show a success message.
+      setEmail("");
+      setPassword("");
       console.log("Registered with email:", email);
-      alert("Registration successful! You can now sign in.");
-      // Redirect to sign-in or home page
+      toast.success("Registration successful! Redirecting to login...");
+
+      // The user is automatically signed in upon successful registration.
+      // You can now redirect them to the home page or a success page.
     } catch (error: any) {
       console.error("Registration error:", error.message);
-      alert(`Registration Failed: ${error.message}`);
+      if (error.code === "auth/email-already-in-use") {
+        toast.error("This email is already in use. Please log in instead.");
+      } else if (
+        error.code === "auth/invalid-email" ||
+        error.code === "auth/weak-password"
+      ) {
+        toast.error(`You have an invalid email and/or a weak password.`);
+      }
     } finally {
       setLoading(false);
     }
@@ -90,6 +149,19 @@ export default function RegisterPage() {
 
   return (
     <div className="bg-[#0F182A] no-repeat bg-cover p-4 mt-0 min-h-screen flex items-center justify-center">
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        className="font-satoshi"
+      />
       <div className="w-full mx-auto bg-[#182138] p-8 rounded-[20px] max-w-sm shadow-2xl">
         {/* Header/Logo */}
         <div className="flex flex-col items-center mb-8">
@@ -107,14 +179,25 @@ export default function RegisterPage() {
         </div>
 
         {/* --- Social Sign-Up (Google) --- */}
-        <button
+        {/* --- Social Sign-In (Google) --- */}
+        <Button
           onClick={handleGoogleRegistration}
           disabled={loading}
-          className="flex items-center justify-center p-3 rounded-xl text-white bg-red-600/90 font-bold text-base w-full transition-colors duration-200 hover:bg-red-700 disabled:opacity-50"
+          className="flex h-12 text-lg items-center justify-center p-3 rounded-xl text-black hover:bg-black hover:text-white bg-white font-bold w-full transition-colors duration-200  disabled:opacity-50"
         >
-          <Chrome className="mr-2" size={20} />
-          {loading ? "Processing..." : "Sign Up with Google"}
-        </button>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="192" // increased from 96
+            height="192" // increased from 96
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="icon mr-4 icon-tabler icons-tabler-filled icon-tabler-brand-google"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M12 2a9.96 9.96 0 0 1 6.29 2.226a1 1 0 0 1 .04 1.52l-1.51 1.362a1 1 0 0 1 -1.265 .06a6 6 0 1 0 2.103 6.836l.001 -.004h-3.66a1 1 0 0 1 -.992 -.883l-.007 -.117v-2a1 1 0 0 1 1 -1h6.945a1 1 0 0 1 .994 .89c.04 .367 .061 .737 .061 1.11c0 5.523 -4.477 10 -10 10s-10 -4.477 -10 -10s4.477 -10 10 -10z" />
+          </svg>
+          {loading ? "Processing..." : "Register with Google"}
+        </Button>
 
         <div className="flex items-center my-6">
           <hr className="grow border-gray-700" />

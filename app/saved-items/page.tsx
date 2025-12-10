@@ -32,7 +32,6 @@ export default function Page() {
               setUserInfo(docSnap.data());
             } else {
               setUserInfo(null);
-              window.alert("No user data found!");
               window.location.href = "/login";
             }
           }
